@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class QuestionService {
@@ -70,7 +68,7 @@ public class QuestionService {
 
     public ResponseEntity<List<QuestionWrapper>> getQuestionsFromIds(List<Integer> questions) {
         try {
-            List<QuestionWrapper> questionWrapper = new ArrayList<>();
+            List<QuestionWrapper> questionWrapperList = new ArrayList<>();
             for( Integer id: questions ){
                 Question q = questionDao.findById(id).get();
                 QuestionWrapper qw = new QuestionWrapper();
@@ -80,9 +78,9 @@ public class QuestionService {
                 qw.setOption2(q.getOption2());
                 qw.setOption3(q.getOption3());
                 qw.setOption4(q.getOption4());
-                questionWrapper.add(qw);
+                questionWrapperList.add(qw);
             }
-            return new ResponseEntity<>(questionWrapper,HttpStatus.OK);
+            return new ResponseEntity<>(questionWrapperList,HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
         }

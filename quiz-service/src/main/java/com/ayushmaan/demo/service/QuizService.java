@@ -1,6 +1,7 @@
 package com.ayushmaan.demo.service;
 
 import com.ayushmaan.demo.dao.QuizDao;
+import com.ayushmaan.demo.feign.QuestionInterface;
 import com.ayushmaan.demo.models.QuestionWrapper;
 import com.ayushmaan.demo.models.Quiz;
 import com.ayushmaan.demo.models.Response;
@@ -20,11 +21,11 @@ public class QuizService {
     private QuizDao quizDao;
 
     @Autowired
-    private QuestionDao questionDao;
+    private QuestionInterface questionInterface;
 
     public ResponseEntity<String> createQuiz(String category, int numQ, String title) {
         try{
-            List<Question> questions = questionDao.findRandomQuestionByCategory(category,numQ);
+            List<Integer> questions = questionInterface.createQuiz(category,numQ).getBody();
             Quiz quiz = new Quiz();
             quiz.setTitle(title);
             quiz.setNumQ(numQ);
@@ -40,12 +41,9 @@ public class QuizService {
     public ResponseEntity<List<QuestionWrapper>> getQuiz(Integer quizId) {
         try{
             Optional<Quiz> quiz = quizDao.findById(quizId);
-            List<Question> questions = quiz.get().getQuestions();
-            List<QuestionWrapper> questionWrapperList = new ArrayList<>();
-            for( Question q : questions ){
-                QuestionWrapper qw = new QuestionWrapper(q.getId(),q.getQuestionTitle(),q.getOption1(),q.getOption2(),q.getOption3(),q.getOption4());
-                questionWrapperList.add(qw);
-            }
+            List<Integer> questionIds = quiz.orElseThrow().getQuestions();
+            List<QuestionWrapper> questionWrapperList = questionInterface.getQuestionsFromIds(questionIds).getBody();
+            assert questionWrapperList != null;
             return new ResponseEntity<>(questionWrapperList,HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
@@ -55,15 +53,11 @@ public class QuizService {
 
     public ResponseEntity<Integer> submitQuiz(Integer quizId, List<Response> responses) {
         try {
-            int correctAnswers =0;
             Optional<Quiz> quiz = quizDao.findById(quizId);
-            List<Question> questions = quiz.orElseThrow().getQuestions();
-            for( Response response : responses ){
-                Optional<Question> question = questions.stream().filter(q -> q.getId().equals(response.getId())).findFirst();
-                if( question.get().getRightAnswer().equals(response.getResponse()) ){
-                    correctAnswers++;
-                }
+            if( quiz.isEmpty() ){
+                return new ResponseEntity<>(0,HttpStatus.BAD_REQUEST);
             }
+            Integer correctAnswers = questionInterface.getScore(responses).getBody();
             return new ResponseEntity<>(correctAnswers,HttpStatus.ACCEPTED);
         }catch (Exception e){
             e.printStackTrace();

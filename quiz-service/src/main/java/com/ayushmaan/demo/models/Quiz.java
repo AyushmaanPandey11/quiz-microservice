@@ -14,8 +14,8 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String title;
-    @ManyToMany
-    private List<QuestionWrapper> questions;
+    @ElementCollection
+    private List<Integer> questions;
     private Integer numQ;
 
 }

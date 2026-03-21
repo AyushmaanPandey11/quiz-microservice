@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class QuestionWrapper {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,12 +29,4 @@ public class QuestionWrapper {
     @Column(name = "option4")
     private String option4;
 
-    public QuestionWrapper(Integer id, String title, String option1, String option2, String option3, String option4){
-        this.id = id;
-        this.questionTitle=title;
-        this.option1 = option1;
-        this.option2 = option2;
-        this.option3 = option3;
-        this.option4 = option4;
-    }
 }
