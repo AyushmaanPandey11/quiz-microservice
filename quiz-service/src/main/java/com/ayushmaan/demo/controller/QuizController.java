@@ -1,7 +1,7 @@
 package com.ayushmaan.demo.controller;
 
 import com.ayushmaan.demo.models.QuestionWrapper;
-import com.ayushmaan.demo.models.Quiz;
+import com.ayushmaan.demo.models.QuizDto;
 import com.ayushmaan.demo.models.Response;
 import com.ayushmaan.demo.service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,8 @@ public class QuizController {
     private QuizService quizService;
 
     @PostMapping("create")
-    public ResponseEntity<String> createQuiz(@RequestParam String category, @RequestParam int numQ, @RequestParam String title){
-        return quizService.createQuiz(category,numQ,title);
+    public ResponseEntity<String> createQuiz(@RequestBody QuizDto quizDto){
+        return quizService.createQuiz(quizDto.getCategoryName(), quizDto.getNumQ(), quizDto.getTitle());
     }
 
     @GetMapping("getQuiz/{quizId}")
